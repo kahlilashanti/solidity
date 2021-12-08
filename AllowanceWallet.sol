@@ -3,10 +3,15 @@ pragma solidity ^0.8.10;
 //this can be used alongside OpenZeppelin when executing online with remix.ethereum.org
 import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol";
 
+//SafeMath Library
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/math/SafeMath.sol";
+
 //events allow you to listen to things happening on the blockchain with a contract without pulling on a blockchain node
 //events are stored in a sidechain. you cannot retrieve them from within solidity
 
 contract Allowance is Ownable {
+    using SafeMath for uint256;
+
     //event to tell you the allowance has changed
     event AllowanceChanged(
         address indexed _forWho,
@@ -38,9 +43,9 @@ contract Allowance is Ownable {
             _who,
             msg.sender,
             allowance[_who],
-            allowance[_who] - _amount
+            allowance[_who].sub(_amount)
         );
-        allowance[_who] -= _amount;
+        allowance[_who] - allowance[who].sub(_amount);
     }
 }
 
@@ -64,6 +69,10 @@ contract AllowanceWallet is Allowance {
         }
         emit MoneySent(_to, _amount);
         _to.transfer(_amount);
+    }
+
+    function renounceOwnership() public {
+        revert("cannot renounce ownership");
     }
 
     //deposit money to the smart contract
